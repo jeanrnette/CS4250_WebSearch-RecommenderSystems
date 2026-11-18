@@ -47,13 +47,23 @@ def getTermFrequencies(text):
 def addPosting(term, docId, tf):
 
     # Searching for the term in the inverted index
-    
+    existing_term = inverted_index.find_one({ "term": term })
 
     # Creating a new term if it does not exist
-
+    if existing_term is None:
+        inverted_index.insert_one(
+            {
+                "term": term,
+                "postings": [{ "docId": docId, "tf": tf }]
+            }
+        )
 
     # Adding a posting if the term already exists
-
+    else:
+        inverted_index.update_one(
+            { "term": term },
+            { "$push": {"postings": { "docId": docId, "tf": tf }}}
+        )
 
 #-------------------------------------------------------------------------
 # FUNCTION: removePosting
